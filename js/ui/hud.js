@@ -24,7 +24,7 @@ export function renderHud(opts) {
   const d = dateInfo(night);
   const hud = $('#hud');
   hud.innerHTML = '';
-  hud.append(
+  hud.append(...[
     h('div', { class: 'hud-stats' },
       h('div', { class: 'hud-stat coins', id: 'hud-coins', title: 'Coins' }, h('span', { class: 'coin-icon' }), h('b', { id: 'hud-coins-val' }, s.coins)),
       h('div', { class: 'hud-stat rep', id: 'hud-rep', title: `Reputation: ${s.rep.toFixed(2)} / 5` }, h('span', { class: 'stars', html: starHtml(s.rep) })),
@@ -39,7 +39,7 @@ export function renderHud(opts) {
       h('button', { class: 'btn icon', title: 'Monster Guide', 'aria-label': 'Monster Guide', onclick: () => handlers.onGuide?.() }, '👾'),
       h('button', { class: 'btn icon', id: 'hud-mute', title: 'Sound on/off', 'aria-label': 'Toggle sound', onclick: () => { game.settings.sound = !game.settings.sound; saveSettings(); sfx('click'); renderHud(); } }, game.settings.sound ? '🔊' : '🔇'),
       h('button', { class: 'btn icon', title: 'Settings', 'aria-label': 'Settings', onclick: () => handlers.onSettings?.() }, '⚙️')),
-  );
+  ].filter(Boolean));
 }
 
 export function updateHudClock() {

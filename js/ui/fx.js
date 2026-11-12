@@ -67,7 +67,8 @@ export function flyCoins(fromEl, count = 5, target = '#hud-coins') {
 
 // ---------- Confetti burst ----------
 export function confetti(x = window.innerWidth / 2, y = window.innerHeight / 3, n = 40) {
-  if (!game.settings.animSpeed) return;
+  // Never sprinkle confetti over an open window
+  if (!game.settings.animSpeed || blockingOverlay()) return;
   const colors = ['#ffcf7a', '#7ed957', '#a77bff', '#ff6b7a', '#7ad9ff', '#ffd23f'];
   for (let i = 0; i < n; i++) {
     const el = h('div', { class: 'confetti', style: { left: `${x}px`, top: `${y}px`, background: colors[i % colors.length] } });

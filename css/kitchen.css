@@ -139,4 +139,6 @@
   .pantry { grid-template-columns: repeat(auto-fill, minmax(84px, 1fr)); gap: 6px; }
   .riddle { font-size: 0.98rem; }
   .dish-card { width: 132px; }
+  .counter { min-height: 0; padding: 8px; }
+  .dish-card.empty { width: 64px; min-height: 56px; font-size: 1.1rem; }
 }

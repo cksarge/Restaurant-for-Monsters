@@ -4,7 +4,7 @@
 import { DB } from './db.js';
 import { game } from './state.js';
 import { pick, chance, shuffle, weightedPick, uid, randInt } from './utils.js';
-import { generateRiddle, riddleTraits, voiceWrap } from './riddles.js';
+import { riddleTraits, monsterOrder } from './riddles.js';
 import { canMake } from './cooking.js';
 import { crowding, CROWDED } from './layout.js';
 
@@ -82,11 +82,11 @@ export function buildOrder(monster, ctx, { count } = {}) {
       const t = DB.stations[st].adds[0];
       if (!traits.includes(t)) traits.push(t);
     }
-    if (feasible(traits)) return { text: voiceWrap(monster, generateRiddle(traits)), traits };
+    if (feasible(traits)) return { text: monsterOrder(monster, traits), traits };
   }
   // Last resort: any single liked trait that works
-  for (const t of shuffle(pool)) if (feasible([t])) return { text: voiceWrap(monster, generateRiddle([t])), traits: [t] };
-  return { text: voiceWrap(monster, generateRiddle(['soupy'])), traits: ['soupy'] };
+  for (const t of shuffle(pool)) if (feasible([t])) return { text: monsterOrder(monster, [t]), traits: [t] };
+  return { text: monsterOrder(monster, ['soupy']), traits: ['soupy'] };
 }
 
 // ---------- Regulars ----------
@@ -159,7 +159,7 @@ export function createCustomer(speciesId, ctx, opts = {}) {
     let order = null;
     for (let i = 0; i < 30 && !order; i++) {
       const traits = shuffle(pool).slice(0, game.state.rep >= 2 ? 3 : 2);
-      if (canMake(traits, ctx.allIngredients, ctx.stations)) order = { text: voiceWrap(m, generateRiddle(traits)), traits };
+      if (canMake(traits, ctx.allIngredients, ctx.stations)) order = { text: monsterOrder(m, traits), traits };
     }
     c.order = order || buildOrder(m, ctx, { count: 2 });
     c.name = DB.critic.name;

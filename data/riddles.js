@@ -89,7 +89,7 @@ export const TRAIT_PHRASES = {
 
 /** Generic dish words used when no trait provides a noun. */
 export const DISH_HEADS = [
-  'something', 'a little something', 'a snack', 'a plate of something', 'a dish', 'a treat', 'whatever you have',
+  'something', 'a little something', 'a snack', 'a plate of something', 'a dish', 'a treat', 'a bite of something',
 ];
 
 /** Sentence frames. {head} is the dish; {more} is "and"-joined extra clauses. */

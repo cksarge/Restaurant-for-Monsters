@@ -14,7 +14,7 @@ import { game, addCoins, addRep } from './state.js';
 import { h, pick, randInt } from './utils.js';
 import { monsterSVG } from './ui/sprites.js';
 import { sfx } from './audio.js';
-import { toast, confetti } from './ui/fx.js';
+import { toast } from './ui/fx.js';
 
 const COLS = 3;
 const ROWS = 2;
@@ -141,7 +141,7 @@ export function runInspection() {
       done = true;
       const s = game.state;
       const reward = passed ? I.passReward : I.failPenalty;
-      if (passed) { addCoins(reward.coins); addRep(reward.rep); s.stats.inspectionsPassed++; sfx('fanfare'); confetti(); }
+      if (passed) { addCoins(reward.coins); addRep(reward.rep); s.stats.inspectionsPassed++; sfx('fanfare'); }
       else { addCoins(-reward.coins); addRep(-reward.rep); s.stats.inspectionsFailed++; sfx('sad'); }
       sh.summary.inspection = { passed };
       const result = h('div', { class: 'insp-intro' },

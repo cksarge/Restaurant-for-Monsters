@@ -30,13 +30,16 @@ export const plainText = (text) => text.replace(MARK, '$1');
 /** All [phrase|trait] pairs (used to fill the Phrasebook). */
 export const riddlePhrases = (text) => parseRiddle(text).filter((p) => p.trait).map((p) => ({ phrase: p.text.toLowerCase(), trait: p.trait }));
 
-const cap = (s) => s.charAt(0).toUpperCase() + s.slice(1);
+// Change the case of the first real letter (skipping a leading "[" from the markup)
+const firstLetter = (s, fn) => s.replace(/^(\[?)(.)/, (_, b, c) => b + fn(c));
+const cap = (s) => firstLetter(s, (c) => c.toUpperCase());
+const uncap = (s) => firstLetter(s, (c) => c.toLowerCase());
 
 /**
  * Build a fresh riddle for a set of traits, e.g. ['soupy','gloomy','loud'] →
  * "I would like [a stew|soupy] [that has given up on its dreams|gloomy], and [that screams a little|loud]"
  */
-export function generateRiddle(traits) {
+export function generateRiddle(traits, { bare = false, noQuestion = false } = {}) {
   const P = DB.phrases;
   const order = shuffle(traits);
   // A trait with a noun form (e.g. soupy → "soup") can be the dish itself.
@@ -78,15 +81,36 @@ export function generateRiddle(traits) {
     else body += startsBut ? `, ${clauseText}` : `, and ${clauseText}`;
   });
 
-  const frame = pick(DB.orderFrames);
+  // `bare` = just the dish ("a sad stew that screams"), for voices like "TROLL WANT {order}"
+  if (bare) return body;
+  const frame = pick(DB.orderFrames.filter((f) => !noQuestion || !f.endsWith('?')));
   const sentence = frame.replace('{head}', body);
   return cap(sentence);
 }
 
 /** Wrap an order in the monster's personal voice. */
-export function voiceWrap(monster, riddle) {
+export function voiceWrap(monster, riddle, voice = null) {
+  let v = voice || (monster.voice?.length ? pick(monster.voice) : '{order}.');
+  // If the voice adds words after the order ("{order}, if you please."), drop the
+  // order's own end punctuation so we don't get "dreams?, if you please."
+  let after = v.slice(v.indexOf('{order}') + 7);
+  if (/\?$/.test(riddle) && /^[.!]/.test(after)) after = after.slice(1);        // a question keeps its "?"
+  else if (/^[,.!?]/.test(after)) riddle = riddle.replace(/[.!?]+$/, '');
+  v = v.slice(0, v.indexOf('{order}') + 7) + after;
+  // Mid-sentence orders start lowercase ("TROLL WANT a stew"), but not after
+  // a finished sentence ("Boo! Sorry, habit. I would like…") and never "I".
+  const before = v.slice(0, v.indexOf('{order}')).trim();
+  const midSentence = before && (!/[.!?*]$/.test(before) || /\.\.\.$/.test(before));
+  const text = midSentence && !/^\[?I\b/.test(riddle) ? uncap(riddle) : cap(riddle);
+  return v.replace('{order}', text);
+}
+
+/** A complete generated order in a monster's voice for the given traits. */
+export function monsterOrder(monster, traits) {
   const v = monster.voice?.length ? pick(monster.voice) : '{order}.';
-  const lower = riddle.charAt(0).toLowerCase() + riddle.slice(1);
-  // Keep the riddle's capital letter when it starts the sentence.
-  return v.startsWith('{order}') ? v.replace('{order}', riddle) : v.replace('{order}', lower);
+  // Voices that already contain a verb ("TROLL WANT {order}") take a bare dish
+  const bare = /\b(want|vant|have)\b[.\s]*\{order\}/i.test(v);
+  // Voices that keep talking after the order ("{order}... pleeeease...") shouldn't follow a question
+  const noQuestion = v.slice(v.indexOf('{order}') + 7).trim().length > 1;
+  return voiceWrap(monster, generateRiddle(traits, { bare, noQuestion }), v);
 }

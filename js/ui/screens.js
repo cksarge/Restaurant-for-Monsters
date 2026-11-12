@@ -59,8 +59,7 @@ export function showLetter(onDone) {
 // ---------- End-of-night report ----------
 export function showNightReport(sum, onDone) {
   const rep = sum.repDelta || 0;
-  const best = sum.delighted >= Math.max(3, sum.served * 0.7);
-  if (best) setTimeout(() => confetti(), 200);
+  const best = sum.delighted >= Math.max(3, sum.served * 0.7) && sum.walkouts <= 1;
   sfx(best ? 'fanfare' : 'ding');
   openModal({
     title: `🌅 Closing Time — Night ${sum.night + 1}`, closable: false, wide: true,

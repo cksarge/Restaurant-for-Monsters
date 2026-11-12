@@ -139,3 +139,10 @@ input[type='range'] { width: 100%; accent-color: var(--candle); }
 
 /* Accessibility helper */
 .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* Inline gold coin used in text (replaces the 🪙 emoji — see utils.js) */
+.coin-inline {
+  display: inline-block; width: 0.9em; height: 0.9em; margin: 0 0.12em; vertical-align: -0.1em; border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #fff6b0, #ffd23f 45%, #c48a12);
+  box-shadow: inset 0 -1px 0 rgba(0, 0, 0, 0.25);
+}

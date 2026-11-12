@@ -87,9 +87,22 @@ export function h(tag, props = {}, ...children) {
   }
   for (const c of children.flat()) {
     if (c === null || c === undefined || c === false) continue;
-    el.append(c instanceof Node ? c : document.createTextNode(String(c)));
+    if (c instanceof Node) el.append(c);
+    else appendText(el, String(c));
   }
   return el;
+}
+
+/**
+ * Append text, swapping every 🪙 for a little gold CSS coin (the emoji is
+ * silver on some devices, which doesn't match the coin counter).
+ */
+function appendText(el, text) {
+  if (!text.includes('🪙')) { el.append(document.createTextNode(text)); return; }
+  text.split('🪙').forEach((part, i) => {
+    if (i > 0) el.append(Object.assign(document.createElement('i'), { className: 'coin-inline', title: 'coins' }));
+    if (part) el.append(document.createTextNode(part));
+  });
 }
 
 export function escapeHtml(str) {
