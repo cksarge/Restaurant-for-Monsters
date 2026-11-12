@@ -56,8 +56,9 @@ export function allSeats(state = game.state) {
         def,
         fits: def.fits,
         // anchor = where the monster's feet go (behind the table edge)
+        // Feet sit at the table-top line, so the upper body shows above the table
         x: horizontal ? p.x + ((i + 0.5) * f.w) / def.seats : p.x + f.w / 2,
-        y: horizontal ? p.y + f.h * 0.66 : p.y + ((i + 0.66) * f.h) / def.seats,
+        y: horizontal ? p.y + f.h * 0.52 : p.y + ((i + 0.55) * f.h) / def.seats,
         width: horizontal ? f.w / def.seats : f.w,
         z: p.y,
         outdoor: !!rooms[p.room].outdoor,

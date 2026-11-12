@@ -85,15 +85,16 @@ export const INSPECTOR = {
     '{who} heard from a bat who heard from a rat: the health inspector visits on {day}!',
     '{who} leans in: "My cousin saw a human in a beige suit asking about you. {day}, I think."',
   ],
+  // monster: draw that monster's sprite (otherwise the emoji is shown)
   suspicious: [
-    { emoji: '🧛', fix: '🥸', label: 'Fangs showing!',        excuse: 'He\'s just… very excited about dental hygiene.' },
-    { emoji: '🐙', fix: '🧣', label: 'Tentacle poking out!',  excuse: 'That\'s a very long scarf, actually.' },
-    { emoji: '👻', fix: '🪟', label: 'See-through customer!', excuse: 'It\'s a very clean window!' },
-    { emoji: '🧟', fix: '🎩', label: 'Stitches showing!',     excuse: 'He\'s in fashion. Patchwork is in this year.' },
+    { emoji: '🧛', monster: 'vampire', fix: '🥸', label: 'Fangs showing!',        excuse: 'He\'s just… very excited about dental hygiene.' },
+    { emoji: '🐙', monster: 'kraken', fix: '🧣', label: 'Tentacle poking out!',  excuse: 'That\'s a very long scarf, actually.' },
+    { emoji: '👻', monster: 'ghost', fix: '🪟', label: 'See-through customer!', excuse: 'It\'s a very clean window!' },
+    { emoji: '🧟', monster: 'patchwork', fix: '🎩', label: 'Stitches showing!',     excuse: 'He\'s in fashion. Patchwork is in this year.' },
     { emoji: '👁️', fix: '🍽️', label: 'Eyeball soup!',         excuse: 'Those are grapes. Very round grapes.' },
     { emoji: '🦇', fix: '🧺', label: 'Bat wings on a plate!', excuse: 'Chicken. It\'s chicken. Spooky chicken.' },
-    { emoji: '🐺', fix: '🪒', label: 'Werewolf shedding!',    excuse: 'Our wool sweaters are VERY fluffy.' },
-    { emoji: '🟢', fix: '🧽', label: 'Slime on the floor!',   excuse: 'Fresh lime jello spill. Mopping it now!' },
+    { emoji: '🐺', monster: 'werewolf', fix: '🪒', label: 'Werewolf shedding!',    excuse: 'Our wool sweaters are VERY fluffy.' },
+    { emoji: '🟢', monster: 'slime', fix: '🧽', label: 'Slime on the floor!',   excuse: 'Fresh lime jello spill. Mopping it now!' },
   ],
   inspectorLines: [
     'Hmm. *scribbles*', 'What was that?', 'Is that… normal?', 'Interesting.', 'I see.', '*squints*',

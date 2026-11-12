@@ -42,7 +42,7 @@ function placeCustomer(el, c) {
   const room = roomsList().find((r) => r.id === c.seat.room);
   const m = DB.monsters[c.species];
   const scale = SIZE_SCALE[m.size] || 1;
-  const w = Math.min(0.92, Math.max(0.58, c.seat.width * 0.9)) * scale;
+  const w = Math.min(0.98, Math.max(0.74, c.seat.width * 1.1)) * scale;
   Object.assign(el.style, {
     left: `${(c.seat.x / room.w) * 100}%`,
     top: `${(c.seat.y / room.h) * 100}%`,

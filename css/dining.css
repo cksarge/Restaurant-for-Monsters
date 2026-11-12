@@ -9,7 +9,7 @@
 .room {
   position: relative; margin: 0 auto 18px;
   /* Fit the whole room on screen: width is capped by the available height × aspect ratio */
-  width: min(100%, 900px, calc((100dvh - 290px) * var(--w) / (var(--h) + 1))); border-radius: 20px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45); }
+  width: min(100%, 900px, calc((100dvh - 250px) * var(--w) / (var(--h) + 1))); border-radius: 20px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45); }
 .room-title {
   position: absolute; top: 6px; left: 12px; z-index: 5; font-family: var(--font-display); font-size: 0.85rem;
   padding: 1px 10px; border-radius: 999px; background: rgba(0, 0, 0, 0.45); color: var(--candle);
@@ -86,7 +86,8 @@
 .cust.critic .name-tag { color: #fff; background: #5d6470; }
 
 .order-flag {
-  position: absolute; left: 50%; top: 4%; width: 44px; display: flex; flex-direction: column; align-items: center; gap: 2px;
+  /* Floats just above the monster's head so it never hides their face */
+  position: absolute; left: 50%; bottom: 97%; width: 44px; display: flex; flex-direction: column; align-items: center; gap: 2px;
   transform: translateX(-50%); pointer-events: none;
 }
 .cust:not(.waiting) .order-flag { display: none; }
@@ -143,9 +144,9 @@
 /* ---------- The sign out front ---------- */
 .restaurant-sign {
   position: relative; display: inline-flex; flex-direction: column; align-items: center;
-  padding: 8px 26px 6px; margin-top: 14px; border-radius: 12px; text-align: center;
+  padding: 5px 22px 4px; margin-top: 12px; border-radius: 12px; text-align: center;
 }
-.sign-text { font-family: var(--font-display); font-size: 1.45rem; line-height: 1.1; }
+.sign-text { font-family: var(--font-display); font-size: 1.25rem; line-height: 1.1; }
 .sign-sub { font-size: 0.65rem; letter-spacing: 2px; text-transform: uppercase; opacity: 0.8; }
 .sign-chain { position: absolute; top: -14px; width: 3px; height: 14px; background: repeating-linear-gradient(#999 0 3px, #555 3px 6px); }
 .sign-chain.l { left: 20%; } .sign-chain.r { right: 20%; }

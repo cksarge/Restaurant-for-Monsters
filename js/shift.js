@@ -111,8 +111,9 @@ function buildSpawnSchedule(ctx, ev) {
   const seats = allSeats(s).length;
   const count = clamp(Math.round(4 + s.rep * 1.6 + Math.min(seats, 18) * 0.25 + randInt(0, 2)), 4, 24);
   for (let i = 0; i < count; i++) {
-    // Average of three randoms → most customers arrive mid-evening (a natural dinner rush)
-    const t = 6 + ((rand() + rand() + rand()) / 3) * 410;
+    // The first two guests arrive right after opening so the night starts lively;
+    // the rest bunch up mid-evening (average of two randoms = a gentle dinner rush).
+    const t = i < 2 ? 3 + i * 14 + rand() * 8 : 25 + ((rand() + rand()) / 2) * 390;
     list.push({ t, species: pickSpecies(ctx) });
   }
 

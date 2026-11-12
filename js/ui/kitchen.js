@@ -156,7 +156,7 @@ function renderBowl() {
   el.append(
     h('div', { class: 'bowl' }, h('span', { class: 'bowl-label' }, '🥣 Bowl'), ...slots),
     h('div', { class: 'bowl-preview' }, sh.bowl.length ? [...known].map((t) => traitIcon(t)) : h('span', { class: 'muted' }, 'Pick up to 3 ingredients, then tap a station'), unknown ? h('span', { class: 'chip' }, '❓ ???') : null),
-    sh.bowl.length ? h('button', { class: 'btn small ghost', onclick: () => clearBowl() }, 'Clear') : null,
+    sh.bowl.length ? h('button', { class: 'btn small ghost', onclick: () => clearBowl() }, 'Clear') : '',
   );
 }
 

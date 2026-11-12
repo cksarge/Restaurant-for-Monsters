@@ -14,7 +14,6 @@ import { game, addCoins, addRep } from './state.js';
 import { h, pick, randInt } from './utils.js';
 import { monsterSVG } from './ui/sprites.js';
 import { sfx } from './audio.js';
-import { toast } from './ui/fx.js';
 
 const COLS = 3;
 const ROWS = 2;
@@ -80,7 +79,8 @@ export function runInspection() {
       const slot = pick(free);
       slot.item = pick(I.suspicious);
       slot.el.classList.add('sus');
-      slot.el.querySelector('.insp-thing').textContent = slot.item.emoji;
+      const thing = slot.el.querySelector('.insp-thing');
+      thing.innerHTML = slot.item.monster ? `<span class="insp-mon">${monsterSVG(DB.monsters[slot.item.monster].art)}</span>` : slot.item.emoji;
       slot.el.querySelector('.insp-label').textContent = slot.item.label;
       sfx('pop');
     }
@@ -90,7 +90,10 @@ export function runInspection() {
       slot.item = null;
       slot.el.classList.remove('sus');
       slot.el.classList.add('fixed');
-      slot.el.querySelector('.insp-thing').textContent = fixEmoji;
+      // The disguise pops on top of the monster (or replaces the dish)
+      const thing = slot.el.querySelector('.insp-thing');
+      if (thing.querySelector('.insp-mon')) thing.append(Object.assign(document.createElement('span'), { className: 'insp-disguise', textContent: fixEmoji }));
+      else thing.textContent = fixEmoji;
       slot.el.querySelector('.insp-label').textContent = 'Totally normal!';
       sfx('clean');
       setTimeout(() => { slot.el.classList.remove('fixed'); if (!slot.item) { slot.el.querySelector('.insp-thing').textContent = ''; slot.el.querySelector('.insp-label').textContent = ''; } }, 700);
@@ -101,8 +104,7 @@ export function runInspection() {
       for (const slot of slots.filter((s) => s.col === gaze && s.item)) {
         strikes++;
         sfx('error');
-        sayEl.textContent = `“${slot.item.label.replace('!', '?')}” *scribbles furiously*`;
-        toast({ icon: '😅', text: `You: "${slot.item.excuse}"` });
+        sayEl.textContent = `“${slot.item.label.replace('!', '?')}” *scribbles* — You: “${slot.item.excuse}”`;
         slot.item = null;
         slot.el.classList.remove('sus');
         slot.el.classList.add('spotted');
