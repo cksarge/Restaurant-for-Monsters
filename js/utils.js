@@ -75,7 +75,13 @@ export function h(tag, props = {}, ...children) {
     if (k.startsWith('on') && typeof v === 'function') el.addEventListener(k.slice(2), v);
     else if (k === 'class') el.className = v;
     else if (k === 'html') el.innerHTML = v;
-    else if (k === 'style' && typeof v === 'object') Object.assign(el.style, v);
+    else if (k === 'style' && typeof v === 'object') {
+      // CSS custom properties (--foo) must go through setProperty
+      for (const [sk, sv] of Object.entries(v)) {
+        if (sk.startsWith('--')) el.style.setProperty(sk, String(sv));
+        else el.style[sk] = sv;
+      }
+    }
     else if (k in el && typeof v !== 'string') el[k] = v;
     else el.setAttribute(k, v === true ? '' : v);
   }

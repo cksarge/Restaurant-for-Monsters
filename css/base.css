@@ -2,6 +2,19 @@
    BASE — colour tokens, fonts, buttons and shared building blocks.
    Colours live in :root so the whole game can be re-themed in one place.
    ========================================================================= */
+
+/* Self-hosted fonts (SIL Open Font License — see assets/fonts/OFL-*.txt) */
+@font-face {
+  font-family: 'Griffy';
+  src: url('../assets/fonts/Griffy-Regular.woff2') format('woff2');
+  font-weight: 400; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: 'Nunito';
+  src: url('../assets/fonts/Nunito-Variable.woff2') format('woff2');
+  font-weight: 200 1000; font-style: normal; font-display: swap;
+}
+
 :root {
   --bg: #170f22;
   --bg2: #21172f;

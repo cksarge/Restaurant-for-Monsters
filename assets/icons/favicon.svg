@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!-- A little cauldron with a monster eye peeking out -->
+  <ellipse cx="32" cy="58" rx="22" ry="4" fill="#000" opacity=".3"/>
+  <path d="M8 26 Q6 56 32 57 Q58 56 56 26 Z" fill="#2c2b36" stroke="#0d0d12" stroke-width="3"/>
+  <ellipse cx="32" cy="26" rx="25" ry="7" fill="#7ed957" stroke="#0d0d12" stroke-width="3"/>
+  <circle cx="32" cy="20" r="10" fill="#fff" stroke="#1d1626" stroke-width="2.5"/>
+  <circle cx="33" cy="21" r="5" fill="#a77bff"/>
+  <circle cx="33" cy="21" r="2.4" fill="#120c18"/>
+  <circle cx="29.5" cy="17.5" r="2" fill="#fff"/>
+</svg>

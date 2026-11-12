@@ -1,0 +1,88 @@
+/* =========================================================================
+   LAYOUT — the HUD bar, view switching and the shift's two-pane layout.
+   Desktop: dining room and kitchen side by side.
+   Phones (< 900px): one pane at a time with tabs at the top.
+   ========================================================================= */
+#screen-game { flex-direction: column; height: 100dvh; }
+
+/* ---------- HUD ---------- */
+#hud {
+  display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+  padding: 8px max(12px, env(safe-area-inset-right)) 8px max(12px, env(safe-area-inset-left));
+  background: linear-gradient(180deg, #2a1d3d, #20162f);
+  border-bottom: 2px solid rgba(0, 0, 0, 0.35);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  position: relative; z-index: 30;
+}
+.hud-stats { display: flex; gap: 8px; }
+.hud-stat {
+  display: inline-flex; align-items: center; gap: 6px; min-height: 40px;
+  padding: 4px 12px; border-radius: 999px; background: rgba(0, 0, 0, 0.3);
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.35); font-weight: 900; font-size: 1.05rem; white-space: nowrap;
+}
+.hud-stat.rep .stars i { font-style: normal; }
+.hud-stat.rep .stars i.off { color: rgba(255, 255, 255, 0.22); text-shadow: none; }
+.hud-stat.rep .stars i.half { background: linear-gradient(90deg, var(--gold) 50%, rgba(255, 255, 255, 0.22) 50%); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.hud-stat.rep .stars { color: var(--gold); letter-spacing: 1px; text-shadow: 0 0 8px rgba(255, 210, 63, 0.4); }
+.coin-icon {
+  width: 20px; height: 20px; border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #fff6b0, #ffd23f 45%, #c48a12);
+  box-shadow: inset 0 -2px 0 rgba(0, 0, 0, 0.25), 0 0 8px rgba(255, 210, 63, 0.5);
+}
+.hud-date {
+  display: inline-flex; align-items: center; gap: 8px; border: 0; cursor: pointer;
+  background: rgba(255, 255, 255, 0.06); padding: 4px 12px 4px 6px; border-radius: 14px; min-height: 44px; text-align: left;
+}
+.hud-date:hover { background: rgba(255, 255, 255, 0.12); }
+.hud-moon { font-size: 1.7rem; filter: drop-shadow(0 0 6px rgba(255, 240, 200, 0.6)); }
+.hud-date-text { display: flex; flex-direction: column; line-height: 1.1; }
+.hud-date-text small { color: var(--muted); font-size: 0.75rem; }
+.hud-clock { font-weight: 900; font-size: 1.1rem; padding: 6px 12px; border-radius: 12px; background: rgba(0, 0, 0, 0.3); min-width: 120px; text-align: center; font-variant-numeric: tabular-nums; }
+.hud-clock.closing { color: var(--candle); box-shadow: 0 0 0 2px rgba(255, 159, 67, 0.5); }
+.hud-buttons { display: flex; gap: 6px; margin-left: auto; }
+
+/* ---------- Views ---------- */
+#game-main { position: relative; flex: 1; min-height: 0; }
+.view { position: absolute; inset: 0; display: none; }
+.view.active { display: block; }
+
+#view-shift.active {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(360px, 1fr);
+  grid-template-rows: minmax(0, 1fr);
+  gap: 12px; padding: 12px;
+}
+.pane-tabs { display: none; }
+#dining-pane { min-height: 0; display: flex; flex-direction: column; position: relative; }
+#kitchen-pane { min-height: 0; }
+#close-up-btn { position: absolute; left: 50%; bottom: 16px; transform: translateX(-50%); z-index: 40; }
+
+#view-hub, #view-build { padding: 16px; }
+
+/* ---------- Phones & small tablets ---------- */
+@media (max-width: 899px) {
+  #view-shift.active { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr); padding: 8px 8px 0; gap: 8px; }
+  .pane-tabs { display: flex; gap: 6px; }
+  .pane-tab {
+    flex: 1; min-height: 44px; border: 0; border-radius: 12px; font-weight: 800; cursor: pointer;
+    background: var(--panel); color: var(--muted); position: relative;
+  }
+  .pane-tab.active { background: var(--panel3); color: var(--ink); box-shadow: inset 0 -3px 0 var(--candle); }
+  #view-shift[data-pane='dining'] #kitchen-pane { display: none; }
+  #view-shift[data-pane='kitchen'] #dining-pane { display: none; }
+  #view-hub, #view-build { padding: 10px; }
+}
+
+@media (max-width: 560px) {
+  #hud { gap: 6px; padding: 6px 8px; }
+  .hud-stat { min-height: 34px; padding: 2px 9px; font-size: 0.95rem; }
+  .hud-date-text small { display: none; }
+  .hud-clock { min-width: 0; font-size: 0.95rem; padding: 4px 8px; }
+  .hud-buttons { width: 100%; justify-content: flex-end; margin-left: 0; }
+  .hud-buttons .btn.icon { width: 40px; min-height: 40px; }
+}
+
+.badge {
+  display: inline-grid; place-items: center; min-width: 22px; height: 22px; padding: 0 6px; margin-left: 4px;
+  border-radius: 999px; background: var(--red); color: #fff; font-size: 0.8rem; font-weight: 900;
+}
