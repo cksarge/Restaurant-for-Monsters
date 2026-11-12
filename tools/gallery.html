@@ -1,0 +1,46 @@
+<!doctype html>
+<!--
+  Sprite Gallery — a developer page that draws every monster, mood, piece of
+  furniture, decoration and station. Handy when adding new content.
+  Open it through a local server: http://localhost:3000/tools/gallery.html
+-->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sprite Gallery</title>
+  <link rel="stylesheet" href="../css/base.css">
+  <link rel="stylesheet" href="../css/animations.css">
+  <style>
+    body { padding: 16px; overflow: auto; height: auto; }
+    h2 { margin: 24px 0 8px; }
+    .grid { display: flex; flex-wrap: wrap; gap: 12px; }
+    .cell { width: 120px; text-align: center; font-size: 12px; background: var(--panel); border-radius: 12px; padding: 8px; }
+    .cell .monster { width: 100px; height: 140px; margin: 0 auto; }
+    .cell svg { width: 100%; height: 100%; }
+    .furn { width: 200px; height: 110px; }
+    .dec { width: 90px; height: 90px; margin: 0 auto; }
+  </style>
+</head>
+<body>
+  <h1>Sprite Gallery</h1>
+  <h2>Monsters</h2><div class="grid" id="monsters"></div>
+  <h2>Moods</h2><div class="grid" id="moods"></div>
+  <h2>Furniture</h2><div class="grid" id="furniture"></div>
+  <h2>Decorations</h2><div class="grid" id="decor"></div>
+  <h2>Stations &amp; dishes</h2><div class="grid" id="stations"></div>
+  <script type="module">
+    import { DB } from '../js/db.js';
+    import { monsterSVG, furnitureSVG, decorSVG, stationSVG, dishSVG } from '../js/ui/sprites.js';
+    const add = (id, html, label, cls = '') => document.getElementById(id).insertAdjacentHTML('beforeend', `<div class="cell ${cls}"><div class="${id === 'decor' ? 'dec' : 'monster'}">${html}</div>${label}</div>`);
+    for (const m of DB.monsterList) add('monsters', monsterSVG(m.art), m.name);
+    add('monsters', monsterSVG(DB.inspector.art), 'Inspector');
+    for (const hp of DB.helperList) add('monsters', monsterSVG(hp.art), hp.role);
+    for (const mood of ['neutral', 'delighted', 'unimpressed', 'confused', 'onfire', 'angry'])
+      for (const id of ['vampire', 'kraken', 'skeleton']) add('moods', monsterSVG(DB.monsters[id].art, { mood }), `${id} · ${mood}`);
+    for (const f of DB.furnitureList) document.getElementById('furniture').insertAdjacentHTML('beforeend', `<div class="cell" style="width:${f.w * 100 + 16}px"><div style="width:${f.w * 100}px;height:${f.h * 100}px">${furnitureSVG(f, f.w, f.h)}</div>${f.name}</div>`);
+    for (const d of DB.decorList) add('decor', decorSVG(d), d.name);
+    for (const s of DB.stationList) add('stations', stationSVG(s.id) + dishSVG(s.id), s.name);
+  </script>
+</body>
+</html>

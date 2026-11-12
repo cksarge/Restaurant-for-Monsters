@@ -1,0 +1,128 @@
+/* =========================================================================
+   BASE — colour tokens, fonts, buttons and shared building blocks.
+   Colours live in :root so the whole game can be re-themed in one place.
+   ========================================================================= */
+:root {
+  --bg: #170f22;
+  --bg2: #21172f;
+  --panel: #2c2140;
+  --panel2: #392a52;
+  --panel3: #47356a;
+  --line: rgba(255, 230, 255, 0.12);
+  --ink: #f8efff;
+  --muted: #bba9d9;
+  --candle: #ffcf7a;
+  --candle-deep: #ff9f43;
+  --green: #7ed957;
+  --green-deep: #3f9a3a;
+  --purple: #a77bff;
+  --red: #ff6b7a;
+  --gold: #ffd23f;
+  --blue: #7ad9ff;
+  --radius: 16px;
+  --radius-sm: 10px;
+  --shadow: 0 6px 0 rgba(0, 0, 0, 0.25), 0 12px 30px rgba(0, 0, 0, 0.35);
+  --font-display: 'Griffy', 'Chewy', 'Comic Sans MS', cursive;
+  --font-body: 'Nunito', 'Trebuchet MS', system-ui, sans-serif;
+  /* Animation speed multiplier — set from Settings (1 = normal, 2 = half speed) */
+  --anim-k: 1;
+  --light: #ffcf7a; /* restaurant lighting colour, set by Build Mode */
+  color-scheme: dark;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  height: 100%;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.4;
+  -webkit-tap-highlight-color: transparent;
+  overscroll-behavior: none;
+}
+
+body {
+  overflow: hidden;
+  background:
+    radial-gradient(1200px 600px at 20% -10%, rgba(167, 123, 255, 0.18), transparent 60%),
+    radial-gradient(900px 500px at 110% 110%, rgba(126, 217, 87, 0.12), transparent 60%),
+    var(--bg);
+}
+
+h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 400; margin: 0 0 0.4em; letter-spacing: 0.02em; }
+h1 { font-size: clamp(2rem, 6vw, 3.4rem); }
+h2 { font-size: 1.6rem; }
+h3 { font-size: 1.25rem; }
+p { margin: 0 0 0.6em; }
+small, .muted { color: var(--muted); }
+a { color: var(--candle); }
+
+button { font: inherit; color: inherit; }
+
+/* ---------- Buttons ---------- */
+.btn {
+  --btn-bg: var(--panel3);
+  --btn-edge: #241838;
+  display: inline-flex; align-items: center; justify-content: center; gap: 0.4em;
+  min-height: 44px; padding: 0.55em 1.1em;
+  border: 0; border-radius: 999px;
+  background: var(--btn-bg);
+  box-shadow: 0 4px 0 var(--btn-edge), inset 0 2px 0 rgba(255, 255, 255, 0.18);
+  color: var(--ink); font-weight: 800; cursor: pointer;
+  transition: transform calc(0.08s * var(--anim-k)), box-shadow calc(0.08s * var(--anim-k)), filter 0.15s;
+  user-select: none; touch-action: manipulation;
+}
+.btn:hover { filter: brightness(1.12); }
+.btn:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--btn-edge), inset 0 2px 0 rgba(255, 255, 255, 0.18); }
+.btn:disabled { opacity: 0.45; cursor: not-allowed; filter: grayscale(0.4); }
+.btn:focus-visible { outline: 3px solid var(--candle); outline-offset: 2px; }
+.btn.primary { --btn-bg: linear-gradient(180deg, #ffd98a, #ff9f43); --btn-edge: #9a4f12; color: #3a1d05; }
+.btn.green { --btn-bg: linear-gradient(180deg, #9ff07a, #46b13e); --btn-edge: #1f6a1d; color: #0f2e0c; }
+.btn.danger { --btn-bg: linear-gradient(180deg, #ff8b97, #d6455a); --btn-edge: #7a1a2a; }
+.btn.ghost { --btn-bg: transparent; box-shadow: inset 0 0 0 2px var(--line); }
+.btn.small { min-height: 36px; padding: 0.3em 0.8em; font-size: 0.9rem; }
+.btn.icon { width: 44px; padding: 0; font-size: 1.25rem; }
+.btn.big { font-size: 1.25rem; padding: 0.7em 1.6em; min-height: 56px; }
+
+/* ---------- Panels & cards ---------- */
+.card {
+  background: linear-gradient(180deg, var(--panel2), var(--panel));
+  border-radius: var(--radius);
+  box-shadow: var(--shadow), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  padding: 16px;
+}
+.chip {
+  display: inline-flex; align-items: center; gap: 0.25em;
+  padding: 0.12em 0.55em; border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08); font-size: 0.82rem; font-weight: 700; white-space: nowrap;
+}
+.chip.trait { background: color-mix(in srgb, var(--tc, #888) 22%, transparent); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--tc, #888) 55%, transparent); }
+.row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.spacer { flex: 1; }
+.hidden { display: none !important; }
+.center { text-align: center; }
+
+.scroll { overflow: auto; -webkit-overflow-scrolling: touch; scrollbar-width: thin; scrollbar-color: var(--panel3) transparent; }
+
+/* ---------- Progress bars ---------- */
+.bar { height: 8px; border-radius: 999px; background: rgba(0, 0, 0, 0.35); overflow: hidden; }
+.bar > i { display: block; height: 100%; width: var(--p, 100%); border-radius: inherit; background: var(--green); transition: width 0.25s linear, background 0.3s; }
+.bar.warn > i { background: var(--gold); }
+.bar.danger > i { background: var(--red); }
+
+/* ---------- Form controls ---------- */
+input[type='text'] {
+  font: inherit; color: var(--ink); background: var(--bg2);
+  border: 2px solid var(--line); border-radius: var(--radius-sm); padding: 0.5em 0.8em; min-height: 44px; width: 100%;
+}
+input[type='range'] { width: 100%; accent-color: var(--candle); }
+
+/* ---------- Screens ---------- */
+.screen { position: fixed; inset: 0; display: none; }
+.screen.active { display: flex; }
+
+/* Accessibility helper */
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }

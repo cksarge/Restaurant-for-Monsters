@@ -1,0 +1,520 @@
+/**
+ * MONSTERS — every species that can walk through the door.
+ *
+ * Fields:
+ *   id, name, blurb           identity + Monster Guide text
+ *   art                       sprite recipe for js/ui/sprites.js:
+ *       body    'tall' | 'round' | 'blob' | 'ghost' | 'wide' | 'tentacle' | 'skeleton' | 'human' | 'small'
+ *       color   main skin colour, belly = lighter tummy colour
+ *       eyes    1 | 2 | 3, eyeColor = iris colour
+ *       mouth   'fangs' | 'smile' | 'tusks' | 'flat' | 'o' | 'grin' | 'beak' | 'teeth'
+ *       extras  accessory names (see EXTRAS in sprites.js), accent = accessory colour
+ *   size                      'small' | 'medium' | 'big' | 'giant' (which seats fit — see furniture.js)
+ *   patience                  in-game minutes they'll wait for food once seated
+ *   tip                       'generous' | 'polite' | 'stingy' | 'chaotic' | 'exact' | 'trinket'
+ *   likes                     traits they usually order
+ *   dislikes                  traits that make them grumpy (downgrades the reaction)
+ *   fire                      traits that set them comically ON FIRE
+ *   hatesIngredients          ingredient ids that offend them
+ *   comfort                   furniture ids they love sitting at (+patience, +tips)
+ *   lovesDecor                decoration ids that attract them
+ *   themes {love, hate}       restaurant themes they love/hate
+ *   minRep / minSpook         reputation / Spookiness needed before they visit
+ *   weight                    how common they are
+ *   moonOnly                  only visit on these moon phases (0 = new, 4 = full)
+ *   moonLikes                 { phase: [traits] } — orders change with the moon
+ *   event                     only visits during this seasonal event
+ *   special                   'dragonfire' → sometimes asks to be cooked with own breath
+ *   orders                    handwritten riddles. Markup: [phrase|trait]
+ *                             optional moon: [phases] to restrict a riddle to those phases
+ *   voice                     wrappers for generated orders; {order} is replaced
+ *   lines                     arrive / delighted / unimpressed / confused / onfire / walkout
+ */
+export const MONSTERS = [
+  {
+    id: 'vampire', name: 'Vampire',
+    blurb: 'Dramatic, nocturnal and extremely particular about garlic. Will tell you about their 400-year-old wine collection whether you ask or not.',
+    art: { body: 'tall', color: '#cbb8ec', belly: '#ece2fb', eyes: 2, eyeColor: '#d62839', mouth: 'fangs', extras: ['cape', 'hair-slick', 'bowtie'], accent: '#7a1730' },
+    size: 'medium', patience: 95, tip: 'polite',
+    likes: ['gloomy', 'cold', 'spooky', 'sweet'], dislikes: ['glowy'], fire: [], hatesIngredients: ['garlic'],
+    comfort: ['coffin-booth'], lovesDecor: ['candelabra', 'haunted-portrait'], themes: { love: ['gothic'], hate: ['carnival'] },
+    minRep: 0, minSpook: 0, weight: 10,
+    orders: [
+      { riddle: 'Something [cold|cold] and [brooding|gloomy], like a 300-year-old grudge.' },
+      { riddle: 'A [sweet|sweet] little nibble [that says "boo"|spooky]. For my nerves.' },
+      { riddle: 'Darkness. Despair. [Ice|cold]. And maybe [something sad|gloomy] on the side.' },
+    ],
+    voice: ['{order}, if you please.', '*swishes cape* {order}.', 'Good evening. {order}. Bleh.', 'I vant... {order}.'],
+    lines: {
+      arrive: ['What a delightfully dreary establishment.', 'I have been awake for six hours. I am starving.'],
+      delighted: ['Exquisite! Like a moonless night!', 'Magnificent. I shall write a sonnet about it.', 'Bleh! Bleh-licious!'],
+      unimpressed: ['It is... adequate. Like a Tuesday.', 'Hmm. My castle chef did it better in 1742.'],
+      confused: ['This is not what I ordered. I think. What did I order?', 'Is this... cheerful? Take it away.'],
+      onfire: ['AAAH! MY CAPE! MY BEAUTIFUL CAPE!'],
+      walkout: ['I have waited centuries before. But not for SOUP.', 'Farewell. I shall brood elsewhere.'],
+    },
+  },
+  {
+    id: 'werewolf', name: 'Werewolf',
+    blurb: 'A big softie with a big appetite. What they crave depends entirely on the moon. On full moon nights, they arrive in hungry packs.',
+    art: { body: 'wide', color: '#8d6e5a', belly: '#d9c2a8', eyes: 2, eyeColor: '#ffcc33', mouth: 'teeth', extras: ['ears-wolf', 'snout', 'fur'], accent: '#5c4537' },
+    size: 'big', patience: 70, tip: 'generous',
+    likes: ['crunchy', 'smoky', 'loud'], dislikes: ['sparkly'], fire: [],
+    moonLikes: { 4: ['crunchy', 'loud', 'smoky', 'spicy'], 0: ['sweet', 'squishy', 'gloomy'], 2: ['crunchy', 'smoky', 'sweet'], 6: ['smoky', 'squishy', 'loud'] },
+    comfort: ['booth', 'giant-table'], lovesDecor: ['giant-bone'], themes: { love: ['swamp', 'carnival'], hate: ['ice'] },
+    minRep: 0, minSpook: 0, weight: 8,
+    orders: [
+      { riddle: 'AWOOO! Something [crunchy|crunchy] that [howls back|loud]!', moon: [4] },
+      { riddle: 'MEAT. FIRE. [GRILL MARKS|smoky]. [CRUNCH|crunchy]. AWOOOO!', moon: [4, 3, 5] },
+      { riddle: "The moon's gone. I feel... fragile. Something [soft and squishy|squishy] and [sweet|sweet], please.", moon: [0, 1, 7] },
+      { riddle: 'Half moon, half hungry. Something [toasty|smoky] and a bit [crunchy|crunchy].', moon: [2, 6] },
+    ],
+    voice: ['{order}! *tail wags*', 'GRR— sorry. {order}, please.', '*sniff sniff* {order}!', 'Awoo! {order}!'],
+    lines: {
+      arrive: ['*sniffs the whole room*', 'Is this a good spot? Am I a good boy? I mean, customer?'],
+      delighted: ['AWOOOOO! BEST! DINNER! EVER!', '*tail wagging intensifies*', 'Who\'s a good chef? YOU are!'],
+      unimpressed: ['*sad little whine*', 'It\'s okay. I\'ve eaten worse. I ate a shoe once.'],
+      confused: ['*tilts head*', 'Is this... a toy? Can I fetch it?'],
+      onfire: ['HOT HOT HOT! *runs in circles* AWOOOO!'],
+      walkout: ['*whimpers and leaves to chase a car*'],
+    },
+  },
+  {
+    id: 'swamp-creature', name: 'Swamp Creature',
+    blurb: 'Smells like a bog because they ARE mostly bog. Pays in shiny pebbles, which are surprisingly valuable.',
+    art: { body: 'blob', color: '#4f9a5a', belly: '#9ed27c', eyes: 2, eyeColor: '#ffef5e', mouth: 'smile', extras: ['moss', 'drips', 'fins'], accent: '#2f6a3a' },
+    size: 'big', patience: 105, tip: 'trinket',
+    likes: ['slimy', 'gloomy', 'stinky', 'soupy'], dislikes: ['cold'], fire: [],
+    comfort: ['swamp-booth'], lovesDecor: ['man-eating-plant', 'fog-machine'], themes: { love: ['swamp'], hate: ['ice'] },
+    minRep: 0, minSpook: 0, weight: 8,
+    orders: [
+      { riddle: 'Blorp. [Soup|soupy]. [Slimy|slimy] soup. Blorp blorp.' },
+      { riddle: 'Something that [smells like home|stinky] (the bog) and is [a bit sad|gloomy] (also the bog).' },
+      { riddle: 'Need [goo|slimy]. Need [stink|stinky]. Need it now. Please. Blorp.' },
+    ],
+    voice: ['Blorp. {order}.', '{order}. *drip*', '*gurgles* {order}!'],
+    lines: {
+      arrive: ['*squelches in* Blorp!', 'Nice moisture in here. Blorp.'],
+      delighted: ['BLORP! (That means "five stars")', 'Tastes like the bog of my childhood!'],
+      unimpressed: ['Blorp... (That means "meh")'],
+      confused: ['Why is it dry? Why is ANYTHING dry?'],
+      onfire: ['BLORP! I\'M EVAPORATING!'],
+      walkout: ['Blorp. *slides out sadly*'],
+    },
+  },
+  {
+    id: 'mummy', name: 'Mummy',
+    blurb: 'Three thousand years old and convinced that everything — even ice water — is far too spicy. Extremely patient. Has seen empires fall.',
+    art: { body: 'tall', color: '#e9dcc0', belly: '#f6eedc', eyes: 1, eyeColor: '#3fd0c9', mouth: 'flat', extras: ['bandages'], accent: '#b9a77f' },
+    size: 'medium', patience: 130, tip: 'exact',
+    likes: ['ancient', 'crunchy', 'sweet', 'gloomy'], dislikes: ['zappy', 'loud'], fire: ['spicy'],
+    comfort: ['booth'], lovesDecor: ['candelabra', 'suit-of-armor'], themes: { love: ['gothic'], hate: ['carnival'] },
+    minRep: 0.5, minSpook: 0, weight: 7,
+    orders: [
+      { riddle: 'Something [from before the pyramids|ancient]. But NOT spicy. Nothing spicy. I mean it.' },
+      { riddle: 'In my day, we ate [crunchy|crunchy] things. And they were [sweet|sweet]. And we were GRATEFUL.' },
+      { riddle: 'Something [old|ancient] and [quiet|gloomy], like me.' },
+    ],
+    voice: ['{order}. And not spicy!', '*unravels slightly* {order}.', 'Young one... {order}.'],
+    lines: {
+      arrive: ['*creaks* Ah. A table. In my day we had... also tables.', 'Is it spicy in here? It feels spicy.'],
+      delighted: ['Splendid! Only a LITTLE spicy.', 'Reminds me of the Old Kingdom. Lovely.'],
+      unimpressed: ['Too spicy. (It was not spicy.)', 'Pharaohs have eaten better. And worse. Mostly better.'],
+      confused: ['What is this? In my day we had bread. And sand. Mostly sand.'],
+      onfire: ['TOO SPICY! I TOLD YOU! THREE THOUSAND YEARS AND I\'VE NEVER— AAAH!'],
+      walkout: ['I have waited three millennia. I can wait elsewhere.'],
+    },
+  },
+  {
+    id: 'kraken', name: 'Kraken',
+    blurb: 'The politest creature from the deep. Apologizes to the chair before sitting. Takes up a whole booth but tips like a gentleman.',
+    art: { body: 'tentacle', color: '#e2725b', belly: '#f7b39f', eyes: 2, eyeColor: '#2a4d8f', mouth: 'smile', extras: ['top-hat', 'monocle'], accent: '#2b2140' },
+    size: 'big', patience: 130, tip: 'generous',
+    likes: ['salty', 'slimy', 'cold', 'soupy'], dislikes: ['smoky'], fire: [], hatesIngredients: ['squid-ink'],
+    comfort: ['booth', 'tide-booth'], lovesDecor: ['fish-tank'], themes: { love: ['ice', 'swamp'], hate: [] },
+    minRep: 0, minSpook: 0, weight: 6,
+    orders: [
+      { riddle: 'Terribly sorry to bother you, but might I have something [that tastes like the deep sea|salty]? Only if it\'s no trouble!' },
+      { riddle: 'Pardon me — [soup|soupy], [but sad|gloomy], if you would be so kind. Thank you ever so much.' },
+      { riddle: 'Something [chilly|cold] and [slippery|slimy], please. Like a nice afternoon in the abyss.' },
+    ],
+    voice: ['Terribly sorry, but {order}, please.', 'If it\'s not too much bother: {order}. Thank you!', 'Pardon me. {order}. So sorry.'],
+    lines: {
+      arrive: ['Oh! So sorry, is this tentacle in your way?', 'Good evening! Lovely place. Sorry about the dripping.'],
+      delighted: ['Oh, how marvellous! Thank you, thank you, thank you, thank you, thank you, thank you, thank you, thank you!', 'Splendid! I shall tell all eight of my arms!'],
+      unimpressed: ['Oh, it\'s lovely, really! (It was not.)', 'Very nice! Sorry. Thank you. Sorry.'],
+      confused: ['Oh dear. I think I may have ordered wrong. So sorry!'],
+      onfire: ['Oh my! I appear to be on fire! Terribly sorry! Is there a lake nearby?'],
+      walkout: ['So sorry, I must be going. Not your fault! Probably!'],
+    },
+  },
+  {
+    id: 'ghost', name: 'Ghost',
+    blurb: 'Floats in, floats out. Coins sometimes fall right through their hands, so tips are a gamble. Loves fog and the graveyard patio.',
+    art: { body: 'ghost', color: '#eef1ff', belly: '#ffffff', eyes: 2, eyeColor: '#2a2a40', mouth: 'o', extras: ['blush'], accent: '#b7c0ff' },
+    size: 'small', patience: 85, tip: 'chaotic', outdoorLover: true,
+    likes: ['spooky', 'cold', 'gloomy', 'sweet'], dislikes: ['loud'], fire: [],
+    comfort: [], lovesDecor: ['fog-machine', 'gravestone'], themes: { love: ['gothic', 'ice'], hate: [] },
+    minRep: 0, minSpook: 0, weight: 9,
+    orders: [
+      { riddle: 'Ooooooo... something [colder than a draft in an old house|cold]... ooooo...' },
+      { riddle: 'Something [eerie|spooky] and [sweet|sweet]. Booo-tiful. Ooooo.' },
+      { riddle: 'I miss being alive... Bring me something [that feels the same|gloomy].' },
+    ],
+    voice: ['Ooooo... {order}... ooooo.', 'Boo! Sorry, habit. {order}.', '{order}... pleeeease...'],
+    lines: {
+      arrive: ['*floats through the wall instead of the door*', 'Booo! Hehe. Table for one-ish.'],
+      delighted: ['Boo-tiful! Absolutely boo-tiful!', 'I haven\'t felt this alive since I was alive!'],
+      unimpressed: ['Ooo... it went right through me.', 'Meh-ooooo.'],
+      confused: ['Ooo? OoooOOo? (That means "huh?")'],
+      onfire: ['I\'m a GHOST, how am I on FIRE?!'],
+      walkout: ['*fades away dramatically*'],
+    },
+  },
+  {
+    id: 'slime', name: 'Slime',
+    blurb: 'A wobbly little guy. Usually a stingy tipper, but seat them in a damp Swamp Booth and they get VERY generous.',
+    art: { body: 'blob', color: '#7de0c9', belly: '#c3fff0', eyes: 2, eyeColor: '#1b5e55', mouth: 'smile', extras: ['shine', 'drips'], accent: '#3fb8a0', scale: 0.8 },
+    size: 'small', patience: 75, tip: 'stingy',
+    likes: ['slimy', 'squishy', 'sweet', 'glowy'], dislikes: ['crunchy'], fire: [],
+    comfort: ['swamp-booth'], tipBonus: { 'swamp-booth': 1.5 }, lovesDecor: ['man-eating-plant'], themes: { love: ['swamp'], hate: [] },
+    minRep: 0, minSpook: 0, weight: 9,
+    orders: [
+      { riddle: 'Wobble wobble! Something [that jiggles like me|squishy]!' },
+      { riddle: 'Something [gooey|slimy] that [glows like my cousin|glowy]! Wobble!' },
+      { riddle: 'Blip! [Sweet|sweet]! [Wobbly|squishy]! Blip blip!' },
+    ],
+    voice: ['Blip! {order}!', 'Wobble wobble. {order}.', '*jiggles excitedly* {order}!'],
+    lines: {
+      arrive: ['*boing* *boing* *boing*', 'Blip!'],
+      delighted: ['BLIP BLIP BLIP! *wobbles with joy*', '*glows happily*'],
+      unimpressed: ['Blip. *wobbles less*'],
+      confused: ['Bl...ip? *jiggles in confusion*'],
+      onfire: ['BLIIIIP! *bubbling furiously*'],
+      walkout: ['*sad squish* blip.'],
+    },
+  },
+  {
+    id: 'skeleton', name: 'Skeleton',
+    blurb: 'All about that calcium. Rattles when they laugh, which is often. Claims to have no pockets, so tips are small.',
+    art: { body: 'skeleton', color: '#f4f1e8', belly: '#ffffff', eyes: 2, eyeColor: '#ff7a3d', mouth: 'teeth', extras: ['bowtie'], accent: '#ff7a3d' },
+    size: 'small', patience: 70, tip: 'stingy', outdoorLover: true,
+    likes: ['crunchy', 'loud', 'ancient', 'salty'], dislikes: ['slimy'], fire: [],
+    comfort: ['bone-bar'], lovesDecor: ['gravestone', 'jack-o-lantern'], themes: { love: ['carnival'], hate: [] },
+    minRep: 0, minSpook: 0, weight: 8,
+    orders: [
+      { riddle: 'Something [that crunches like my knees|crunchy]! Nyeh heh heh!' },
+      { riddle: 'I need calcium and [noise|loud]! Make it [CRUNCH|crunchy]!' },
+      { riddle: "Something [salty|salty]! I don't have a tongue but I have DREAMS." },
+    ],
+    voice: ['Nyeh heh! {order}!', '*rattles* {order}!', 'Bone appétit! I mean — {order}!'],
+    lines: {
+      arrive: ['*rattle rattle*', 'Hello! I had to come. I had no body to stop me! Nyeh heh!'],
+      delighted: ['That tickled my funny bone!', 'Bone-a-fide masterpiece!'],
+      unimpressed: ['Eh. I\'ve got no stomach for this. Literally.'],
+      confused: ['It fell right through my ribs!'],
+      onfire: ['NYEH! I\'M A TORCH!'],
+      walkout: ['I\'m bone-tired of waiting.'],
+    },
+  },
+  {
+    id: 'troll', name: 'Troll',
+    blurb: 'Enormous, gentle, and heavy. Will only sit at a Reinforced Giant Table (they broke the last three regular ones).',
+    art: { body: 'wide', color: '#8aa36b', belly: '#c3d49c', eyes: 2, eyeColor: '#6b3a1f', mouth: 'tusks', extras: ['warts', 'hair-tuft'], accent: '#5f7546', scale: 1.15 },
+    size: 'giant', patience: 65, tip: 'generous',
+    likes: ['crunchy', 'stinky', 'smoky', 'ancient'], dislikes: ['sparkly'], fire: [],
+    comfort: ['giant-table'], lovesDecor: [], themes: { love: ['swamp'], hate: ['carnival'] },
+    minRep: 1.5, minSpook: 0, weight: 5,
+    orders: [
+      { riddle: 'TROLL WANT [ROCK-CRUNCH|crunchy]. AND [STINK|stinky]. PLEASE. TROLL POLITE.' },
+      { riddle: 'Something [burnt|smoky]. Troll like burnt. Burnt is crunchy fire.' },
+      { riddle: 'TROLL WANT FOOD [OLD AS MOUNTAIN|ancient].' },
+    ],
+    voice: ['TROLL WANT {order}.', '{order}. Troll say please.', 'HUNGRY. {order}.'],
+    lines: {
+      arrive: ['*the floor creaks*', 'TROLL HERE. TROLL HUNGRY.'],
+      delighted: ['TROLL HAPPY! *happy stomping*', 'BEST FOOD UNDER ANY BRIDGE!'],
+      unimpressed: ['Troll... okay. Troll fine.'],
+      confused: ['Troll not understand food.'],
+      onfire: ['HOT! TROLL HOT! *stomp stomp stomp*'],
+      walkout: ['TROLL GO HOME. TROLL SAD.'],
+    },
+  },
+  {
+    id: 'dragon', name: 'Dragon',
+    blurb: 'Loves spice, shiny things and showing off. Occasionally insists their food be cooked with their OWN fiery breath — you\'ll have to make them sneeze onto the grill.',
+    art: { body: 'wide', color: '#d94f4f', belly: '#f7c66b', eyes: 2, eyeColor: '#ffd23f', mouth: 'grin', extras: ['horns', 'wings', 'snout', 'spikes'], accent: '#7d1f2a' },
+    size: 'big', patience: 80, tip: 'trinket', special: 'dragonfire',
+    likes: ['spicy', 'smoky', 'sparkly', 'crunchy'], dislikes: ['cold'], fire: [],
+    comfort: ['giant-table'], lovesDecor: ['candelabra', 'disco-skull'], themes: { love: ['gothic', 'carnival'], hate: ['ice'] },
+    minRep: 2.5, minSpook: 5, weight: 4,
+    orders: [
+      { riddle: 'Something [that makes me breathe fire|spicy] and [sparkles like my hoard|sparkly]!' },
+      { riddle: 'Bring me something [scorched|smoky]. The more scorched the better. Rawr.' },
+      { riddle: 'I demand something [sparkly|sparkly]. I collect sparkly things. And then I EAT them.' },
+    ],
+    voice: ['RAWR. {order}.', '*smoke puffs* {order}!', 'Mortal! {order}!'],
+    lines: {
+      arrive: ['*ducks under the door frame*', 'What a cute little cave you have.'],
+      delighted: ['MAGNIFICENT! *happy smoke rings*', 'I shall add your name to my hoard of favourite things!'],
+      unimpressed: ['Hmph. Not enough fire.'],
+      confused: ['Is this... cold? You brought a DRAGON something cold?'],
+      onfire: ['Oh, I\'m always on fire. That\'s fine. Carry on.'],
+      walkout: ['*leaves in a huff of smoke*'],
+    },
+  },
+  {
+    id: 'witch', name: 'Witch',
+    blurb: 'Brings her own spoon. Loves anything cursed or sparkly. Her tips are random because she pays partly in spells.',
+    art: { body: 'human', color: '#9ad17b', belly: '#3d2a5c', eyes: 2, eyeColor: '#7b2cbf', mouth: 'grin', extras: ['hat-witch', 'hair-long'], accent: '#3d2a5c' },
+    size: 'medium', patience: 90, tip: 'chaotic',
+    likes: ['cursed', 'sparkly', 'stinky', 'glowy'], dislikes: [], fire: [],
+    comfort: [], lovesDecor: ['crystal-ball', 'cauldron-decor'], themes: { love: ['swamp', 'gothic'], hate: [] },
+    minRep: 0.5, minSpook: 8, weight: 6,
+    orders: [
+      { riddle: 'Hee hee! Something [with a tiny curse on it|cursed] and [glittery|sparkly], dearie!' },
+      { riddle: 'Something [that smells like a witch\'s sock drawer|stinky]. Lovely. Cackle.' },
+      { riddle: 'Eye of newt! Toe of frog! Or just something [glowing|glowy], I\'m not fussy.' },
+    ],
+    voice: ['Hee hee! {order}, dearie.', 'Cackle! {order}!', 'Double, double... {order}.'],
+    lines: {
+      arrive: ['*parks broom by the door*', 'Ooh, nice cauldron. Mine\'s bigger.'],
+      delighted: ['Hee hee hee! Wicked good!', 'I\'m stealing this recipe. Er, borrowing.'],
+      unimpressed: ['Needs more newt.'],
+      confused: ['Is this a potion or a dinner? Either way, no.'],
+      onfire: ['Not AGAIN! Last time this happened I was on a broom!'],
+      walkout: ['*flies off on broom, cackling grumpily*'],
+    },
+  },
+  {
+    id: 'patchwork', name: 'Patchwork Monster',
+    blurb: 'Assembled from many spare parts, all of which are hungry. Loves anything electric. Dreams of becoming a chef.',
+    art: { body: 'tall', color: '#8fbf8a', belly: '#b9dcb2', eyes: 2, eyeColor: '#2d3a2b', mouth: 'flat', extras: ['bolts', 'stitches', 'hair-flat'], accent: '#555c66' },
+    size: 'big', patience: 80, tip: 'polite',
+    likes: ['zappy', 'glowy', 'loud', 'smoky'], dislikes: ['cold'], fire: [],
+    comfort: ['booth'], lovesDecor: ['tesla-coil'], themes: { love: ['gothic'], hate: [] },
+    minRep: 1, minSpook: 0, weight: 6,
+    orders: [
+      { riddle: 'FOOD. GOOD. [ZAP|zappy] GOOD.' },
+      { riddle: 'Something [that hums like my bolts|zappy] and [glows|glowy]. Please. Bolt say please now.' },
+      { riddle: 'Something [LOUD|loud]! Bolt like loud! Loud like thunder! Thunder like... ZAP!' },
+    ],
+    voice: ['{order}. GOOD.', 'Bolt want {order}.', 'FRIEND! {order}!'],
+    lines: {
+      arrive: ['*bzzzt*', 'FRIEND!'],
+      delighted: ['GOOD! GOOOOD! *bolts spark*', 'IT\'S ALIIIIVE! (The flavour.)'],
+      unimpressed: ['...Okay.'],
+      confused: ['Bolt... confused. Bolt usually confused. But more.'],
+      onfire: ['FIRE BAD! FIRE BAAAAD!'],
+      walkout: ['Bolt sad. Bolt go.'],
+    },
+  },
+  {
+    id: 'shadow', name: 'Shadow Creature',
+    blurb: 'Extremely shy. Only comes out on the new moon, when it\'s darkest. Hates bright, glowy food. Tips generously when treated gently.',
+    art: { body: 'ghost', color: '#2a2440', belly: '#3a3358', eyes: 2, eyeColor: '#f4f1ff', mouth: 'none', extras: ['wisps'], accent: '#6c5ce7' },
+    size: 'small', patience: 60, tip: 'generous',
+    likes: ['gloomy', 'cold', 'spooky', 'squishy'], dislikes: ['loud', 'sparkly'], fire: ['glowy'],
+    comfort: ['coffin-booth'], lovesDecor: ['fog-machine'], themes: { love: ['gothic'], hate: ['carnival'] },
+    minRep: 0, minSpook: 10, weight: 14, moonOnly: [0, 7],
+    orders: [
+      { riddle: '...something... [dark and sad|gloomy]... if that\'s okay... sorry...' },
+      { riddle: '*whispers* [cold|cold]... please... no bright things...' },
+      { riddle: '...something [soft|squishy]... and [quiet and spooky|spooky]...' },
+    ],
+    voice: ['...{order}... sorry...', '*whispers* {order}.', '...um... {order}...?'],
+    lines: {
+      arrive: ['*slips in under the door*', '...hi...'],
+      delighted: ['...wow... thank you...', '*happy shadow shimmer*'],
+      unimpressed: ['...it\'s okay...'],
+      confused: ['...oh... um... okay...'],
+      onfire: ['TOO BRIGHT! TOO BRIGHT! *poof*'],
+      walkout: ['*melts into a corner and is gone*'],
+    },
+  },
+  {
+    id: 'gorgon', name: 'Gorgon',
+    blurb: 'Wears sunglasses for everyone\'s safety. Each snake in her hair has its own opinion about dinner.',
+    art: { body: 'human', color: '#7cc6a1', belly: '#a5559b', eyes: 2, eyeColor: '#111111', mouth: 'smile', extras: ['snakes', 'sunglasses'], accent: '#a5559b' },
+    size: 'medium', patience: 85, tip: 'polite',
+    likes: ['stinky', 'salty', 'spicy', 'cursed'], dislikes: ['sweet'], fire: [],
+    comfort: [], lovesDecor: ['suit-of-armor', 'haunted-portrait'], themes: { love: ['gothic'], hate: [] },
+    minRep: 1.5, minSpook: 15, weight: 5,
+    orders: [
+      { riddle: 'Something [salty|salty]. The snakes want something [that bites back|spicy]. Hissss.' },
+      { riddle: 'Something [ripe|stinky]. Sssssomething sssssmelly. Sssssorry.' },
+      { riddle: 'Don\'t look at me. Just bring something [hexed|cursed]. Thanksss.' },
+    ],
+    voice: ['Hisss. {order}.', '{order}. (The snakes agree.)', 'Don\'t make eye contact. {order}.'],
+    lines: {
+      arrive: ['*adjusts sunglasses*', 'Don\'t worry, the shades stay on.'],
+      delighted: ['Ssssensational! The snakes are purring!', 'Sssimply stunning! (Not literally.)'],
+      unimpressed: ['The sssnakes are... divided.'],
+      confused: ['One snake liked it. The other twelve did not.'],
+      onfire: ['HISSSSSSS! ALL THE SNAKES ARE HISSING!'],
+      walkout: ['I\'ll take my ssssnakes elsewhere.'],
+    },
+  },
+  {
+    id: 'yeti', name: 'Yeti',
+    blurb: 'Big, fluffy and always too warm. Loves cold desserts. Melts a little if you serve anything spicy.',
+    art: { body: 'wide', color: '#f2f6fb', belly: '#cfe3f2', eyes: 2, eyeColor: '#1e5f8c', mouth: 'smile', extras: ['fluff', 'horns-small'], accent: '#8bb6d9', face: '#9ec7e6' },
+    size: 'big', patience: 90, tip: 'generous',
+    likes: ['cold', 'sweet', 'crunchy', 'sparkly'], dislikes: ['smoky'], fire: ['spicy'],
+    comfort: ['ice-table'], lovesDecor: ['snow-sculpture'], themes: { love: ['ice'], hate: ['swamp'] },
+    minRep: 2, minSpook: 0, weight: 5,
+    orders: [
+      { riddle: 'Phew, it\'s hot in here. Something [that gives me brain-freeze|cold], please!' },
+      { riddle: 'Something [sweet|sweet] and [frosty|cold]. Like a snowball, but dessert.' },
+      { riddle: 'Something [crunchy like fresh snow|crunchy]! Yeti yummy!' },
+    ],
+    voice: ['*fans self* {order}!', 'Yeti want {order}!', 'Brrr-illiant. {order}, please!'],
+    lines: {
+      arrive: ['*ducks* Phew! It\'s so warm in here!', 'Hello! Sorry about the fluff.'],
+      delighted: ['Brrr-illiant! Snow-licious!', '*happy yeti dance*'],
+      unimpressed: ['A bit warm, but okay.'],
+      confused: ['Hmm. Not chilly at all.'],
+      onfire: ['I\'M MELTING! I\'M MEEELTIIIING!'],
+      walkout: ['Too hot in here! *leaves to roll in snow*'],
+    },
+  },
+  {
+    id: 'banshee', name: 'Banshee',
+    blurb: 'Communicates mostly by wailing. Loves soup and sad things. Please keep the windows shut when she\'s pleased.',
+    art: { body: 'ghost', color: '#c9e4ff', belly: '#eef6ff', eyes: 2, eyeColor: '#304a7a', mouth: 'o', extras: ['hair-long'], accent: '#7a9cc6' },
+    size: 'small', patience: 80, tip: 'polite', outdoorLover: true,
+    likes: ['loud', 'gloomy', 'soupy', 'cold'], dislikes: ['sweet'], fire: [],
+    comfort: [], lovesDecor: ['haunted-portrait', 'fog-machine'], themes: { love: ['gothic', 'ice'], hate: [] },
+    minRep: 1, minSpook: 20, weight: 5,
+    orders: [
+      { riddle: 'WAAAAAIL! [A stew|soupy]! [A sad stew|gloomy]! WAAAIL!' },
+      { riddle: 'Something [that screams with me|loud]! A duet! WAAAAIL!' },
+      { riddle: 'Something [freezing|cold] and [tragic|gloomy]. *sniffle* WAAAIL.' },
+    ],
+    voice: ['WAAAIL! {order}!', '*sobs* {order}.', '{order}! *wails softly*'],
+    lines: {
+      arrive: ['*wails gently*', 'WAAAIL! (That means hello.)'],
+      delighted: ['WAAAAAAAAAAIL! (That means it\'s wonderful!)', '*happy wailing*'],
+      unimpressed: ['*disappointed wail*'],
+      confused: ['WAIL? (That means "what?")'],
+      onfire: ['WAAAAAAAAAAAAAAAAAAAAAIL!'],
+      walkout: ['*wails off into the night*'],
+    },
+  },
+  {
+    id: 'imp', name: 'Imp',
+    blurb: 'Tiny, mischievous and always in a hurry. Loves spicy candy. Tips in buttons they stole from someone\'s coat.',
+    art: { body: 'small', color: '#e0566b', belly: '#ff9aa8', eyes: 2, eyeColor: '#ffe14d', mouth: 'grin', extras: ['horns', 'tail'], accent: '#7d1f2a', scale: 0.75 },
+    size: 'small', patience: 55, tip: 'trinket',
+    likes: ['spicy', 'sweet', 'zappy', 'loud'], dislikes: ['gloomy'], fire: [],
+    comfort: ['bone-bar'], lovesDecor: ['disco-skull', 'jack-o-lantern'], themes: { love: ['carnival'], hate: ['gothic'] },
+    minRep: 1, minSpook: 0, weight: 6,
+    orders: [
+      { riddle: 'Quick quick! Something [hot-hot|spicy] AND [sugary|sweet]! Quick!' },
+      { riddle: 'Hehehe! Something [buzzy|zappy]! Make it [noisy|loud]! Hehehe!' },
+    ],
+    voice: ['Hehe! {order}! Quick!', '{order}! Chop chop!', 'Oi! {order}!'],
+    lines: {
+      arrive: ['*zips in*', 'Hehehe! Hi!'],
+      delighted: ['WHEEEE! Spicy sweet sweet spicy!', 'Hehehe! You\'re good!'],
+      unimpressed: ['Boring! Hehe. But okay.'],
+      confused: ['What? Hehe? What?'],
+      onfire: ['HEHE— OW! HEHE— OW!'],
+      walkout: ['Too slow! *zips off*'],
+    },
+  },
+
+  // ---------- Seasonal event visitors ----------
+  {
+    id: 'bog-fairy', name: 'Bog Fairy', event: 'swamp-bloom',
+    blurb: 'Only appears during Swamp Bloom. Tiny, sparkly and slightly damp.',
+    art: { body: 'small', color: '#b6e88a', belly: '#e9ffd2', eyes: 2, eyeColor: '#6a2c91', mouth: 'smile', extras: ['moth-wings', 'leaves'], accent: '#f6b3e6', scale: 0.7 },
+    size: 'small', patience: 85, tip: 'generous',
+    likes: ['sweet', 'sparkly', 'slimy'], dislikes: ['stinky'], fire: [],
+    comfort: ['lily-table'], lovesDecor: ['bog-lily'], themes: { love: ['swamp'], hate: [] },
+    minRep: 0, minSpook: 0, weight: 14,
+    orders: [
+      { riddle: 'Tee-hee! Something [twinkly|sparkly] and [sweet as a blossom|sweet]!' },
+      { riddle: 'Something [dewy and gooey|slimy] like the morning bog!' },
+    ],
+    voice: ['Tee-hee! {order}!', '*sprinkles dust* {order}!'],
+    lines: { arrive: ['*flutters in*'], delighted: ['Tee-hee-hee! Magical!'], unimpressed: ['Tee... hee.'], confused: ['Is this a mushroom? I don\'t eat my friends!'], onfire: ['EEP! My wings!'], walkout: ['*flutters away*'] },
+  },
+  {
+    id: 'moth-folk', name: 'Moth Folk', event: 'midnight-picnic',
+    blurb: 'Visits for the Midnight Picnic. Fluffy, polite and VERY distracted by lamps.',
+    art: { body: 'round', color: '#d8c8a8', belly: '#f3ead6', eyes: 2, eyeColor: '#1a1a1a', mouth: 'smile', extras: ['moth-wings', 'antennae', 'fluff'], accent: '#a88f6a' },
+    size: 'small', patience: 80, tip: 'polite',
+    likes: ['glowy', 'sweet', 'smoky'], dislikes: ['cold'], fire: [],
+    comfort: ['picnic-table'], lovesDecor: ['picnic-lanterns', 'candelabra'], themes: { love: ['carnival'], hate: [] },
+    minRep: 0, minSpook: 0, weight: 14,
+    orders: [
+      { riddle: 'Something that [glows like a lovely lamp|glowy]... oh, a lamp! ...sorry, what was I saying?' },
+      { riddle: 'Something [toasty like a campfire|smoky] and [sweet|sweet], like a picnic!' },
+    ],
+    voice: ['Oh! {order}, please. Ooh, a light!', '{order}! *flutters*'],
+    lines: { arrive: ['*flutters toward the candles*'], delighted: ['Lamp-tastic!'], unimpressed: ['Hm. Not very glowy.'], confused: ['Wait. Where am I? Ooh, light!'], onfire: ['I flew too close! I always fly too close!'], walkout: ['*flies off toward a streetlight*'] },
+  },
+  {
+    id: 'pumpkin-head', name: 'Pumpkin Head', event: 'harvest-moon',
+    blurb: 'Rolls in for the Harvest Moon Festival. Has a candle for a brain and a heart of pie.',
+    art: { body: 'round', color: '#ff9234', belly: '#ffc078', eyes: 2, eyeColor: '#ffef5e', mouth: 'grin', extras: ['pumpkin', 'scarf'], accent: '#6a8f3d', glowFace: true },
+    size: 'medium', patience: 90, tip: 'generous',
+    likes: ['sweet', 'smoky', 'spooky', 'crunchy'], dislikes: [], fire: [],
+    comfort: ['pumpkin-table'], lovesDecor: ['scarecrow', 'jack-o-lantern'], themes: { love: ['carnival'], hate: [] },
+    minRep: 0, minSpook: 0, weight: 14,
+    orders: [
+      { riddle: 'Something [spooky|spooky] and [pie-sweet|sweet]! It\'s HARVEST time!' },
+      { riddle: 'Something [roasted|smoky] and [crackly|crunchy], like autumn leaves!' },
+    ],
+    voice: ['Happy Harvest! {order}!', '*flickers* {order}!'],
+    lines: { arrive: ['*rolls in*'], delighted: ['GOURD-geous!'], unimpressed: ['A bit squash-ed.'], confused: ['Hm? My candle\'s flickering.'], onfire: ['Wait, I\'m SUPPOSED to be on fire. Inside. Not outside!'], walkout: ['*rolls away*'] },
+  },
+  {
+    id: 'frost-imp', name: 'Frost Sprite', event: 'frost-fright',
+    blurb: 'Blows in with the Frost Fright. Leaves tiny frost patterns on every table.',
+    art: { body: 'small', color: '#a8e6ff', belly: '#e8faff', eyes: 2, eyeColor: '#1e5f8c', mouth: 'grin', extras: ['frost', 'scarf'], accent: '#5aa9d6', scale: 0.75 },
+    size: 'small', patience: 80, tip: 'chaotic',
+    likes: ['cold', 'sparkly', 'crunchy'], dislikes: ['spicy', 'smoky'], fire: ['spicy'],
+    comfort: ['ice-table'], lovesDecor: ['snow-sculpture', 'icicle-lights'], themes: { love: ['ice'], hate: ['swamp'] },
+    minRep: 0, minSpook: 0, weight: 14,
+    orders: [
+      { riddle: 'Something [frosty|cold] and [glittery like snowflakes|sparkly]!' },
+      { riddle: 'Something that goes [crunch like ice|crunchy]! Brrr-hee-hee!' },
+    ],
+    voice: ['Brrr-hee! {order}!', '*frosty giggle* {order}!'],
+    lines: { arrive: ['*frost spreads across the doorway*'], delighted: ['Ice-credible!'], unimpressed: ['Not cool. Literally.'], confused: ['Why is it warm?!'], onfire: ['MELTING! HELP!'], walkout: ['*blows away like a snowflake*'] },
+  },
+
+  // ---------- The critic (special, never randomly chosen) ----------
+  {
+    id: 'critic', name: 'Gargoyle Critic', critic: true,
+    blurb: 'Sir Reginald Crumbleton, food critic for The Nightly Howl. Made of stone, impossible to impress, writes reviews that make or break restaurants.',
+    art: { body: 'wide', color: '#9aa0a8', belly: '#c3c8cf', eyes: 2, eyeColor: '#c0392b', mouth: 'flat', extras: ['wings', 'horns-small', 'monocle', 'beret', 'cracks'], accent: '#5d6470' },
+    size: 'medium', patience: 75, tip: 'stingy',
+    likes: ['ancient', 'cursed', 'sparkly', 'smoky', 'gloomy', 'spooky', 'salty', 'zappy'], dislikes: [], fire: [],
+    comfort: [], lovesDecor: [], themes: { love: [], hate: [] },
+    minRep: 0, minSpook: 0, weight: 0,
+    orders: [],
+    voice: ['*scribbles notes* I shall have {order}.', 'Hmph. {order}. Impress me.', 'The critic will have {order}. *adjusts monocle*'],
+    lines: {
+      arrive: ['*sits. Scribbles. Sniffs.*'],
+      delighted: ['...Hm. *scribbles furiously*'],
+      unimpressed: ['*scribbles* "Adequate."'],
+      confused: ['*scribbles* "Baffling."'],
+      onfire: ['*scribbles while on fire* "Bold."'],
+      walkout: ['I have seen enough.'],
+    },
+  },
+];
+
+/** Shared fallback lines when a species doesn't have one. */
+export const GENERIC_LINES = {
+  arrive: ['*looks around hungrily*'],
+  delighted: ['Delicious!'],
+  unimpressed: ['It\'s fine.'],
+  confused: ['What is this?'],
+  onfire: ['HOT HOT HOT!'],
+  walkout: ['I\'m leaving!'],
+  noSeat: ['Nothing here fits me!'],
+};
