@@ -5,6 +5,7 @@
  */
 import { game, on } from './state.js';
 import { h, $ } from './utils.js';
+import { blockingOverlay } from './ui/popups.js';
 
 const STEPS = [
   { text: 'Welcome to your first night! Monsters will wander in and sit at your tables. Here comes one now…', waitFor: 'customer:seated', target: null, button: false },
@@ -60,6 +61,10 @@ function end() {
 function position() {
   const st = STEPS[step];
   if (!st || !bubble) return;
+  // Step aside while a window (settings, recipe book…) is open
+  const covered = blockingOverlay();
+  bubble.classList.toggle('hidden', covered);
+  if (covered) { ring.classList.add('hidden'); return; }
   const target = st.target ? document.querySelector(st.target) : null;
   const r = target?.getBoundingClientRect();
   if (!r || r.width === 0) {

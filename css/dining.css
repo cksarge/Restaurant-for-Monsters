@@ -87,7 +87,7 @@
 
 .order-flag {
   /* Floats just above the monster's head so it never hides their face */
-  position: absolute; left: 50%; bottom: 97%; width: 44px; display: flex; flex-direction: column; align-items: center; gap: 2px;
+  position: absolute; left: 50%; bottom: var(--head-gap, 97%); width: 44px; display: flex; flex-direction: column; align-items: center; gap: 2px;
   transform: translateX(-50%); pointer-events: none;
 }
 .cust:not(.waiting) .order-flag { display: none; }
@@ -99,7 +99,7 @@
 
 /* Speech & reaction bubbles */
 .bubble {
-  position: absolute; left: 50%; bottom: calc(100% - 4px); transform: translate(-50%, 0);
+  position: absolute; left: 50%; bottom: var(--head-gap, calc(100% - 4px)); transform: translate(-50%, 0);
   width: max-content; max-width: min(230px, 60vw); padding: 8px 12px;
   background: #fff8ec; color: #2b1d33; border-radius: 16px; font-size: 0.82rem; font-weight: 700; line-height: 1.3;
   box-shadow: 0 4px 0 rgba(0, 0, 0, 0.25), 0 10px 20px rgba(0, 0, 0, 0.3); z-index: 10; pointer-events: none; text-align: center;

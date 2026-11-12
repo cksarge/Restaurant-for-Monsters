@@ -7,7 +7,7 @@ import { game, on } from '../state.js';
 import { h, $, escapeHtml } from '../utils.js';
 import { roomsList } from '../layout.js';
 import { renderRoom, signEl } from './room.js';
-import { monsterSVG } from './sprites.js';
+import { monsterSVG, headFraction } from './sprites.js';
 import { customerArt } from '../customers.js';
 import { selectCustomer, cleanSeat, shooGhost } from '../shift.js';
 import { plainText } from '../riddles.js';
@@ -56,7 +56,8 @@ function custElement(c) {
   const el = h('div', {
     class: `cust entering${c.isCritic ? ' critic' : ''}${c.regularId ? ' regular' : ''}`,
     'data-uid': c.uid, 'data-body': art.body,
-    style: { '--d': `${c.animDelay}s`, '--d2': `${c.animDelay * 1.7}s` },
+    // --head-gap: distance from the box top to the head, so flags & bubbles sit right on top of it
+    style: { '--d': `${c.animDelay}s`, '--d2': `${c.animDelay * 1.7}s`, '--head-gap': `${(1 - headFraction(art)) * 100}%` },
     role: 'button', tabindex: '0', 'aria-label': `${c.name}. Tap to see their order.`,
     onclick: () => selectCustomer(c.uid),
     onkeydown: (e) => { if (e.key === 'Enter' || e.key === ' ') selectCustomer(c.uid); },

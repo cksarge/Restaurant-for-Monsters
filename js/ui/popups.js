@@ -57,7 +57,15 @@ function collect() {
       items.push({ el, pri, mode, order: order++, rect: { left: cx - w / 2, right: cx + w / 2, top, bottom: top + hgt } });
     }
   }
-  return items.sort((a, b) => b.pri - a.pri || a.order - b.order);
+  // Full windows (modals, inspector, pause) are all priority 115+. Among them the
+  // NEWEST one wins (e.g. a confirm dialog opened from Settings), so sort those
+  // by document position, latest first. Everything else keeps rule/DOM order.
+  return items.sort((a, b) => {
+    if (a.pri >= 115 && b.pri >= 115 && a.el !== b.el) {
+      return a.el.compareDocumentPosition(b.el) & Node.DOCUMENT_POSITION_FOLLOWING ? 1 : -1;
+    }
+    return b.pri - a.pri || a.order - b.order;
+  });
 }
 
 function layout() {

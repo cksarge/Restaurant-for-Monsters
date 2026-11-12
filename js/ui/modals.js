@@ -129,7 +129,8 @@ export function openMonsterGuide() {
     // Favourite flavours reveal themselves as you delight them
     const likesKnown = Math.min(m.likes.length, Math.floor(b.delighted / 2) + (b.delighted > 0 ? 1 : 0));
     const regs = DB.regularList.filter((r) => r.species === m.id && s.regulars[r.id]);
-    detail.append(
+    // (filter(Boolean): append() would print "null" for skipped sections)
+    detail.append(...[
       h('div', { class: 'guide-portrait', html: monsterSVG(m.art, { mood: 'delighted' }) }),
       h('h3', {}, m.name),
       h('p', {}, m.blurb),
@@ -145,7 +146,7 @@ export function openMonsterGuide() {
       ...regs.map((r) => h('div', { class: 'regular-card' }, h('b', {}, `⭐ ${r.name}`), h('p', { class: 'muted' }, r.tagline),
         h('div', { class: 'bar' }, h('i', { style: { width: `${(s.regulars[r.id].chapter / r.chapters.length) * 100}%` } })),
         h('small', {}, s.regulars[r.id].done ? 'Story complete! 💜' : `Chapter ${s.regulars[r.id].chapter + 1} of ${r.chapters.length}`))),
-    );
+    ].filter(Boolean));
   };
 
   for (const m of DB.monsterList) {

@@ -321,6 +321,17 @@ function mouthSvg(art, a, mood, ids) {
 
 // ---------- Monster ----------
 /**
+ * How far down the sprite's box the top of the head sits (0–1). The SVG has
+ * headroom for hats, so flags and speech bubbles use this to hug the head.
+ */
+export function headFraction(art) {
+  const top = (BODIES[art.body] || BODIES.round)().top;
+  const scale = art.scale || 1;
+  const scaledTop = 136 - (136 - top) * scale; // bodies scale around the feet (y = 136)
+  return Math.max(0, (scaledTop + 30 - 6) / 172); // viewBox starts at y = -30 and is 172 tall
+}
+
+/**
  * Build a monster SVG string.
  * @param art   art recipe from data/monsters.js (can be merged with a regular's extras)
  * @param opts  { mood: 'neutral'|'delighted'|'unimpressed'|'confused'|'onfire'|'angry', cls }

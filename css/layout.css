@@ -76,9 +76,10 @@
 @media (max-width: 560px) {
   #hud { gap: 6px; padding: 6px 8px; }
   .hud-stat { min-height: 34px; padding: 2px 9px; font-size: 0.95rem; }
-  .hud-date-text small { display: none; }
+  .hud-date-text { display: none; }
+  .hud-date { padding: 4px 6px; }
   .hud-clock { min-width: 0; font-size: 0.95rem; padding: 4px 8px; }
-  .hud-buttons { width: 100%; justify-content: flex-end; margin-left: 0; }
+  .hud-buttons { margin-left: auto; } /* shares the second row with the clock */
   .hud-buttons .btn.icon { width: 40px; min-height: 40px; }
 }
 
